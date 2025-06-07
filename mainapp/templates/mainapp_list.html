@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block  title %}
+SEO: Analyzer App
+{% endblock %}
+
+{% block content  %}
+<h1 class="text-white text-center mt-4">Welcome to the App</h1>
+
+<a class = "btn btn-primary mb-4" href="{% url 'mainapp_create' %}">Create a mainapp</a>
+
+<div class="container row gap-3">
+{% for mainapp in mainapps %}
+<div class="card" style="width: 18rem;">
+  <img src="{{mainapp.photo.url}}" class="card-img-top" alt="...">
+  <div class="card-body">
+    <h5 class="card-title">{{mainapp.user.username}}</h5>
+    <p class="card-text">{{mainapp.text}}</p>
+    {%if mainapp.user == user %}
+    <a href="{% url 'mainapp_edit' mainapp.id %}" class="btn btn-primary">Edit</a>
+    <a href="{% url 'mainapp_delete' mainapp.id %}" class="btn btn-danger">Delete</a>
+    {% endif %}
+  </div>
+</div>
+{% endfor %}
+</div>
+{% endblock %}
