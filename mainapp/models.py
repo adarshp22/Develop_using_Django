@@ -16,10 +16,11 @@ class Mainapp(models.Model):
         return f"{self.user.username}- {self.text[:10]}"
     
 class SEOAnalysis(models.Model):
-    original_text = models.TextField()
-    analyzed_at = models.DateTimeField(auto_now_add=True)
+    input_text = models.TextField()
+    analyzed_on = models.DateTimeField(auto_now_add=True)
+    keywords = models.JSONField(default=list)  # list of keywords
     readability_score = models.FloatField(null=True, blank=True)
-    keywords = models.JSONField(default=list)  # stores keyword list as JSON
+    suggestions = models.TextField(blank=True)
 
     def __str__(self):
-        return f"Analysis on {self.analyzed_at.strftime('%Y-%m-%d %H:%M:%S')}"
+        return f"SEOAnalysis {self.id}"

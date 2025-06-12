@@ -1,0 +1,118 @@
+{% extends "layout.html" %}
+{% block title %}SEO Analyzer {% endblock %}
+
+{% block content %}
+<style>
+  .form-field {
+    margin-bottom: 1.5rem;
+  }
+  .keyword-button {
+    margin-left: 10px;
+  }
+  .preview-area {
+    white-space: pre-wrap;
+    min-height: 200px;
+  }
+</style>
+
+<div class="container my-5">
+  <!-- Input Form -->
+  <div class="card shadow p-4">
+    <h2 class="mb-4 text-center">SEO Analyzer (Add upto 150 words)</h2>
+    <form method="post" id="analyze-form">
+      {% csrf_token %}
+      <div class="form-field">
+        <label for="inputText" class="form-label">Input Text</label>
+        <textarea id="inputText" name="input_text" rows="10" class="form-control">{{ form.initial.input_text }}</textarea>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Analyze</button>
+    </form>
+  </div>
+
+  <!-- Results -->
+  {% if keywords %}
+  <div class="card mt-4 shadow">
+    <div class="card-body">
+      <h4>SEO Analysis Results</h4>
+      <p><strong>Readability Score:</strong> {{ readability }}</p>
+
+      <!-- Suggestions -->
+      <h5 class="mt-4">SEO Suggestions</h5>
+      {% if suggestions %}
+        <div class="list-group">
+          {% for suggestion in suggestions.splitlines %}
+            {% if "Consider replacing" in suggestion %}
+              <div class="list-group-item list-group-item-warning">
+                <i class="bi bi-lightbulb-fill text-warning me-2"></i>{{ suggestion }}
+              </div>
+            {% else %}
+              <div class="list-group-item list-group-item-info">
+                <i class="bi bi-info-circle-fill text-info me-2"></i>{{ suggestion }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="alert alert-success mt-2">
+          <i class="bi bi-check-circle-fill"></i> No major suggestions — your content looks great!
+        </div>
+      {% endif %}
+
+      <!-- Keywords -->
+      <h5 class="mt-4">Recommended Keywords</h5>
+      <ul class="list-group mb-3">
+        {% for keyword in keywords %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          {{ keyword }}
+          <button type="button" class="btn btn-sm btn-outline-success keyword-button" onclick="replaceInPreview('{{ keyword }}')">Insert</button>
+        </li>
+        {% endfor %}
+      </ul>
+
+      <!-- Live Preview -->
+      <h5>Live Text Preview (Editable)</h5>
+      <textarea id="text-preview" class="form-control preview-area">{{ original_text }}</textarea>
+      <div class="text-end mt-2">
+        <button type="button" class="btn btn-outline-primary" onclick="applyPreviewToInput()">Apply to Input</button>
+      </div>
+      <p class="mt-2 text-muted">You can modify this preview, replace words, and then re-analyze by applying the text above to input.</p>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- JavaScript -->
+<script>
+  const inputText = document.getElementById("inputText");
+  const preview = document.getElementById("text-preview");
+
+  // Sync preview with input
+  if (inputText && preview) {
+    inputText.addEventListener("input", () => {
+      preview.value = inputText.value;
+    });
+  }
+
+  // Replace selected word in preview with keyword
+  function replaceInPreview(keyword) {
+    const start = preview.selectionStart;
+    const end = preview.selectionEnd;
+
+    if (start !== end) {
+      const text = preview.value;
+      const before = text.slice(0, start);
+      const after = text.slice(end);
+      preview.value = before + keyword + after;
+    } else {
+      alert("Please select a word in the preview area to replace.");
+    }
+  }
+
+  // Push preview text back into input area for re-analysis
+  function applyPreviewToInput() {
+    inputText.value = preview.value;
+    inputText.focus();
+    inputText.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+</script>
+{% endblock %}

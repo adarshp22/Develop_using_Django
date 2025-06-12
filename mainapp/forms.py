@@ -1,5 +1,5 @@
 from django import forms
-from .models import Mainapp
+from .models import Mainapp,SEOAnalysis
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
@@ -8,8 +8,14 @@ class MainappForm(forms.ModelForm):
         model=Mainapp
         fields=['text','photo']
         
-class TextInputForm(forms.Form):
-    text = forms.CharField(widget=forms.Textarea(attrs={'rows': 10, 'cols': 80}), label='Enter your content')
+
+class SEOForm(forms.ModelForm):
+    class Meta:
+        model = SEOAnalysis
+        fields = ['input_text']
+        widgets = {
+            'input_text': forms.Textarea(attrs={'rows': 10, 'cols': 80}),
+        }
     
     
     
